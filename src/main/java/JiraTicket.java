@@ -3,15 +3,15 @@ import java.util.Map;
 
 public class JiraTicket {
     private String projectKey;
-    private String issueType;
+    private String ticketType;
     private String summary;
     private String description;
     private String priority;
     private Map<String, Object> customFields = new HashMap<>();
 
-    public JiraTicket(String projectKey, String issueType, String summary, String description, String priority) {
+    public JiraTicket(String projectKey, String ticketType, String summary, String description, String priority) {
         this.projectKey = projectKey;
-        this.issueType = issueType;
+        this.ticketType = ticketType;
         this.summary = summary;
         this.description = description;
         this.priority = priority;
@@ -25,7 +25,7 @@ public class JiraTicket {
     public Map<String, Object> toJsonMap() {
         Map<String, Object> fields = new HashMap<>();
         fields.put("project", Map.of("key", projectKey));
-        fields.put("issuetype", Map.of("name", issueType));
+        fields.put("tickettype", Map.of("name", ticketType));
         fields.put("summary", summary);
         fields.put("priority", Map.of("name", priority));
         fields.put("description", description);

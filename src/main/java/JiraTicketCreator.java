@@ -11,17 +11,17 @@ public class JiraTicketCreator {
         try {
             // Dynamically fetch ticket details
             String projectKey = ConfigManager.getProperty("project.key");
-            String issueType = ConfigManager.getProperty("issuetype");  // Could be passed dynamically
+            String ticketType = ConfigManager.getProperty("tickettype");  // Could be passed dynamically
             String priority = ConfigManager.getProperty("priority");
             String summary = ConfigManager.getProperty("summary");
-            String description = TemplateManager.getTemplate(issueType);
+            String description = TemplateManager.getTemplate(ticketType);
             String reporterUsername = ConfigManager.getProperty("jira.username"); // Assuming the reporter is the user creating the ticket
 
             // Fetch the accountId of the reporter
             String reporterAccountId = getAccountId(reporterUsername);
 
             // Create a JiraTicket object with the necessary details
-            JiraTicket ticket = new JiraTicket(projectKey, issueType, summary, description, priority);
+            JiraTicket ticket = new JiraTicket(projectKey, ticketType, summary, description, priority);
 
             // Add custom fields if needed (optional)
             String labels = ConfigManager.getProperty("custom.labels");
