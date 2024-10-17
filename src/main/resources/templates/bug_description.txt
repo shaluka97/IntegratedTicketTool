@@ -1,0 +1,19 @@
+h1. Bug Report
+
+*Bold:* Important bug detail here.
+_Italic:_ Minor detail.
+
+h2. Steps to Reproduce
+1. Step one description.
+2. Step two description.
+3. Step three description.
+
+h2. Expected Behavior
+The feature should behave like this.
+
+h2. Actual Behavior
+The feature is broken and behaves like this.
+
+h2. Additional Information
+- Relevant links
+- Further explanations
