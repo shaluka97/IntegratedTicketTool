@@ -45,11 +45,10 @@ public class JiraTicketCreator {
 
         // Load the authentication details from the config
         String jiraUrl = ConfigManager.getProperty("jira.url");
-        String username = ConfigManager.getProperty("jira.username");
-        String apiToken = ConfigManager.getProperty("jira.apiToken");
+        String personalAccessToken = ConfigManager.getProperty("jira.personalAccessToken");
 
-        // Create a basic authentication header
-        String authHeader = "Basic " + java.util.Base64.getEncoder().encodeToString((username + ":" + apiToken).getBytes());
+        // Create a basic authentication header using PAT
+        String authHeader = "Bearer " + personalAccessToken;
 
         // Build the HTTP request
         HttpRequest request = HttpRequest.newBuilder()
@@ -74,10 +73,10 @@ public class JiraTicketCreator {
     private static String getAccountId(String username) throws Exception {
         // Load the authentication details from the config
         String jiraUrl = ConfigManager.getProperty("jira.url");
-        String apiToken = ConfigManager.getProperty("jira.apiToken");
+        String personalAccessToken = ConfigManager.getProperty("jira.personalAccessToken");
 
-        // Create a basic authentication header
-        String authHeader = "Basic " + java.util.Base64.getEncoder().encodeToString((username + ":" + apiToken).getBytes());
+        // Create a basic authentication header using PAT
+        String authHeader = "Bearer " + personalAccessToken;
 
         // Build the HTTP request to fetch user accountId
         HttpRequest request = HttpRequest.newBuilder()
@@ -104,6 +103,7 @@ public class JiraTicketCreator {
             throw new Exception("Failed to fetch user accountId. Response code: " + response.statusCode() + ", Body: " + response.body());
         }
     }
+
     private static String extractTicketId(String responseBody) {
         com.google.gson.JsonObject jsonObject = new com.google.gson.JsonParser().parse(responseBody).getAsJsonObject();
         return jsonObject.get("key").getAsString();
