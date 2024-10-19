@@ -1,4 +1,4 @@
-// src/main/java/ConfigManager.java
+package ticketLogger.libs;// src/main/java/ConfigManager.java
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;

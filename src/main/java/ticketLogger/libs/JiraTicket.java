@@ -1,3 +1,5 @@
+package ticketLogger.libs;
+
 import java.util.HashMap;
 import java.util.Map;
 
