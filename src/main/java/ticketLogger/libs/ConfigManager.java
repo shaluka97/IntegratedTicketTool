@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.Properties;
 
 public class ConfigManager {
-    private static Properties properties = new Properties();
+    private static final Properties properties = new Properties();
 
     static {
         try (InputStream input = ConfigManager.class.getClassLoader().getResourceAsStream("config.properties")) {

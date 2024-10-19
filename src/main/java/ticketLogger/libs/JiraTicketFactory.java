@@ -67,7 +67,7 @@ public class JiraTicketFactory {
         if (response.statusCode() == 200) {
             // Parse the response to get the accountId
             com.google.gson.JsonArray users = new com.google.gson.JsonParser().parse(response.body()).getAsJsonArray();
-            if (users.size() > 0) {
+            if (!users.isEmpty()) {
                 return users.get(0).getAsJsonObject().get("accountId").getAsString();
             } else {
                 throw new Exception("No user found with username: " + username);

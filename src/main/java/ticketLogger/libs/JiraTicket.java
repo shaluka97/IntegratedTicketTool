@@ -4,12 +4,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class JiraTicket {
-    private String projectKey;
-    private String issueType;
-    private String summary;
-    private String description;
-    private String priority;
-    private Map<String, Object> customFields = new HashMap<>();
+    private final String projectKey;
+    private final String issueType;
+    private final String summary;
+    private final String description;
+    private final String priority;
+    private final Map<String, Object> customFields = new HashMap<>();
 
     public JiraTicket(String projectKey, String issueType, String summary, String description, String priority) {
         this.projectKey = projectKey;
