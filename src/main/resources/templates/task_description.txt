@@ -1,3 +1,24 @@
-Task details:
-- Complete by: ...
-- Description: ...
+|| *Description* || *Links* ||
+|EXCH Jira ID: |  |
+|EXCH Story: |  |
+|CRDT Jira ID: |  |
+|CRDT Story: |  |
+|MD Jira ID: |  |
+|MD Story: |  |
+
+h2. DOD:
+
+|| *Item* || *Status* ||
+| Added required prefixes and labels to the summary | Done |
+| Added sub-tasks (Test Plan, Test Scripting, Test Execution) | Done |
+| All required tests are identified, Test plan completed, Test plan reviewed, Test plan attached, Reviewers commented, Sub-task closed | Done |
+| All tests that need to go into the regression test suite are automated unless there are technical limitations | Done |
+| All tests created for the story are executed on the system | In-progress |
+| System test results are recorded using FTRs to the ticket | In-progress |
+| All scripts are added to regression plan | In-progress |
+| Regression tests completed with 90% Pass rate without any "Critical" and "High" defects | Not started |
+| All the bugs are logged in Jira and linked all the bugs to the task | Not started |
+| Time taken to each sub-task is logged in Jira | Not started |
+| All the queries are logged and linked to the task | Not started |
+| Any highlighted points, issues, future works are added as a comment or tasks logged | Not started |
+| All the sub-tasks are closed with the evidence | Not started |
