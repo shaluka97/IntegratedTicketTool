@@ -47,13 +47,18 @@ public class JiraTicketFactory {
         // Load the authentication details from the config
         String jiraUrl = ConfigManager.getProperty("jira.url");
         String apiToken = ConfigManager.getProperty("jira.apiToken");
+        String personalAccessToken = ConfigManager.getProperty("jira.personalAccessToken");
+        String authHeader;
 
         // Create a basic authentication header
-        String authHeader = "Basic " + java.util.Base64.getEncoder().encodeToString((username + ":" + apiToken).getBytes());
-
+        if (apiToken != null) {
+            authHeader = "Basic " + java.util.Base64.getEncoder().encodeToString((username + ":" + apiToken).getBytes());
+        }else{
+            authHeader = "Bearer " + personalAccessToken;
+        }
         // Build the HTTP request to fetch user accountId
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(jiraUrl + "/rest/api/3/user/search?query=" + username))
+                .uri(URI.create(jiraUrl + "/rest/api/2/user/search?query=" + username))
                 .header("Authorization", authHeader)
                 .header("Content-Type", "application/json")
                 .GET()
