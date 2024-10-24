@@ -20,10 +20,10 @@ public class JiraTicketCreator {
         String authHeader;
 
         // Create a basic authentication header
-        if (apiToken != null) {
+        if (!apiToken.isEmpty() & personalAccessToken.isEmpty()) {
             authHeader = "Basic " + java.util.Base64.getEncoder().encodeToString((username + ":" + apiToken).getBytes());
         }else {
-            authHeader = "Bearer" + personalAccessToken;
+            authHeader = "Bearer " + personalAccessToken;
         }
         // Build the HTTP request
         HttpRequest request = HttpRequest.newBuilder()

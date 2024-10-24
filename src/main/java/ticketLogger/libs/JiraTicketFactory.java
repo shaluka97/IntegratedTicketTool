@@ -25,22 +25,73 @@ public class JiraTicketFactory {
         // Add custom fields based on task type
         Map<String, String> customFields = ConfigManager.getPropertiesByPrefix("custom." + taskType + ".");
         for (Map.Entry<String, String> entry : customFields.entrySet()) {
-            if (entry.getKey().equals("labels")) {
-                // Convert labels to an array of strings
-                String[] labelsArray = entry.getValue().split(",");
-                ticket.setCustomField(entry.getKey(), Arrays.asList(labelsArray));
+            String fieldType = getFieldType(entry.getKey());
+            if (fieldType != null) {
+                switch (fieldType) {
+                    case "array":
+                        String[] arrayValues = entry.getValue().split(",");
+                        ticket.setCustomField(entry.getKey(), Arrays.asList(arrayValues));
+                        break;
+                    case "user":
+                        if (entry.getKey().equals("assignee")) {
+                            String reporterUsername = ConfigManager.getProperty("jira.username");
+                            String reporterAccountId = getAccountId(reporterUsername);
+                            ticket.setCustomField(entry.getKey(), Map.of("id", reporterAccountId));
+                        }
+                        break;
+                    default:
+                        ticket.setCustomField(entry.getKey(), entry.getValue());
+                        break;
+                }
             } else {
                 ticket.setCustomField(entry.getKey(), entry.getValue());
             }
         }
 
-        String reporterUsername = ConfigManager.getProperty("jira.username"); // Assuming the reporter is the user creating the ticket
-        // Fetch the accountId of the reporter
-        String reporterAccountId = getAccountId(reporterUsername);
-        //ticket.setCustomField("components", List.of(Map.of("name", "Backend")));
-        ticket.setCustomField("assignee", Map.of("id", reporterAccountId));
-
         return ticket;
+    }
+
+    private static String getFieldType(String fieldName) throws Exception {
+        // Load the authentication details from the config
+        String jiraUrl = ConfigManager.getProperty("jira.url");
+        String apiToken = ConfigManager.getProperty("jira.apiToken");
+        String personalAccessToken = ConfigManager.getProperty("jira.personalAccessToken");
+        String authHeader;
+
+        // Create a basic authentication header
+        if (!apiToken.isEmpty() & personalAccessToken.isEmpty()) {
+            authHeader = "Basic " + java.util.Base64.getEncoder().encodeToString((ConfigManager.getProperty("jira.username") + ":" + apiToken).getBytes());
+        } else {
+            authHeader = "Bearer " + personalAccessToken;
+        }
+
+        // Build the HTTP request to fetch field metadata
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(jiraUrl + "/rest/api/2/field"))
+                .header("Authorization", authHeader)
+                .header("Content-Type", "application/json")
+                .GET()
+                .build();
+
+        // Send the HTTP request
+        HttpClient client = HttpClient.newHttpClient();
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+        // Check the response status
+        if (response.statusCode() == 200) {
+            // Parse the response to get the field type
+            com.google.gson.JsonArray fields = new com.google.gson.JsonParser().parse(response.body()).getAsJsonArray();
+            for (com.google.gson.JsonElement field : fields) {
+                com.google.gson.JsonObject fieldObject = field.getAsJsonObject();
+                if (fieldObject.get("name").getAsString().equals(fieldName)) {
+                    return fieldObject.get("schema").getAsJsonObject().get("type").getAsString();
+                }
+            }
+        } else {
+            throw new Exception("Failed to fetch field metadata. Response code: " + response.statusCode() + ", Body: " + response.body());
+        }
+
+        return null;
     }
 
     private static String getAccountId(String username) throws Exception {
@@ -51,11 +102,12 @@ public class JiraTicketFactory {
         String authHeader;
 
         // Create a basic authentication header
-        if (apiToken != null) {
+        if (!apiToken.isEmpty() & personalAccessToken.isEmpty()) {
             authHeader = "Basic " + java.util.Base64.getEncoder().encodeToString((username + ":" + apiToken).getBytes());
-        }else{
+        } else {
             authHeader = "Bearer " + personalAccessToken;
         }
+
         // Build the HTTP request to fetch user accountId
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(jiraUrl + "/rest/api/2/user/search?query=" + username))

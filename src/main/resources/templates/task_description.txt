@@ -1,12 +1,12 @@
 || *Description* || *Links* ||
-|EXCH Jira ID: |  |
-|EXCH Story: |  |
-|CRDT Jira ID: |  |
-|CRDT Story: |  |
-|MD Jira ID: |  |
-|MD Story: |  |
+|*EXCH Jira ID:* |  |
+|*EXCH Story:* |  |
+|*CRDT Jira ID:* |  |
+|*CRDT Story:* |  |
+|*MD Jira ID:* |  |
+|*MD Story:* |  |
 
-h2. DOD:
+h4. DOD:
 
 || *Item* || *Status* ||
 | Added required prefixes and labels to the summary | Done |
