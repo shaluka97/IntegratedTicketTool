@@ -23,15 +23,20 @@ public class TicketLoggerMain {
             // Extract the assignee from the main ticket
             Optional<Map<String, String>> assignee = Optional.ofNullable((Map<String, String>) ticket.toJsonMap().get("assignee"));
 
-            // Create sub-tasks if the main task is of type "Task"
+            // Create sub-tasks if the main task is of type "Task" and sub-tasks are mentioned in the config
             if ("Task".equalsIgnoreCase(taskType)) {
-                String[] subTaskNames = ConfigManager.getProperty("subtasks.Task").split(",");
-                for (String subTaskName : subTaskNames) {
-                    JiraTicket subTask = ticket.createSubTask(subTaskName.trim());
-                    if (assignee.isPresent()) {
-                        subTask.setCustomField("assignee", assignee);
+                String subTaskNamesProperty = ConfigManager.getProperty("subtasks.Task");
+                if (subTaskNamesProperty != null && !subTaskNamesProperty.trim().isEmpty()) {
+                    String[] subTaskNames = subTaskNamesProperty.split(",");
+                    for (String subTaskName : subTaskNames) {
+                        JiraTicket subTask = ticket.createSubTask(subTaskName.trim());
+                        if (assignee.isPresent()) {
+                            subTask.setCustomField("assignee", assignee);
+                        }
+                        JiraTicketCreator.createJiraSubTask(subTask.toJsonMap(), ticketId);
                     }
-                    JiraTicketCreator.createJiraSubTask(subTask.toJsonMap(), ticketId);
+                } else {
+                    System.out.println("No sub-tasks mentioned in the config. Skipping sub-task creation.");
                 }
             }
         } catch (Exception e) {
