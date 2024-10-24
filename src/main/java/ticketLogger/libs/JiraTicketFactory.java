@@ -1,8 +1,5 @@
 package ticketLogger.libs;
 
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.Arrays;
 import java.util.Map;
@@ -52,30 +49,7 @@ public class JiraTicketFactory {
     }
 
     private static String getFieldType(String fieldName) throws Exception {
-        // Load the authentication details from the config
-        String jiraUrl = ConfigManager.getProperty("jira.url");
-        String apiToken = ConfigManager.getProperty("jira.apiToken");
-        String personalAccessToken = ConfigManager.getProperty("jira.personalAccessToken");
-        String authHeader;
-
-        // Create a basic authentication header
-        if (!apiToken.isEmpty() & personalAccessToken.isEmpty()) {
-            authHeader = "Basic " + java.util.Base64.getEncoder().encodeToString((ConfigManager.getProperty("jira.username") + ":" + apiToken).getBytes());
-        } else {
-            authHeader = "Bearer " + personalAccessToken;
-        }
-
-        // Build the HTTP request to fetch field metadata
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(jiraUrl + "/rest/api/2/field"))
-                .header("Authorization", authHeader)
-                .header("Content-Type", "application/json")
-                .GET()
-                .build();
-
-        // Send the HTTP request
-        HttpClient client = HttpClient.newHttpClient();
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        HttpResponse<String> response = JiraHttpClient.sendGetRequest("/rest/api/2/field");
 
         // Check the response status
         if (response.statusCode() == 200) {
@@ -83,7 +57,7 @@ public class JiraTicketFactory {
             com.google.gson.JsonArray fields = new com.google.gson.JsonParser().parse(response.body()).getAsJsonArray();
             for (com.google.gson.JsonElement field : fields) {
                 com.google.gson.JsonObject fieldObject = field.getAsJsonObject();
-                if (fieldObject.get("name").getAsString().equals(fieldName)) {
+                if (fieldObject.get("key").getAsString().equals(fieldName)) {
                     return fieldObject.get("schema").getAsJsonObject().get("type").getAsString();
                 }
             }
@@ -95,30 +69,7 @@ public class JiraTicketFactory {
     }
 
     private static String getAccountId(String username) throws Exception {
-        // Load the authentication details from the config
-        String jiraUrl = ConfigManager.getProperty("jira.url");
-        String apiToken = ConfigManager.getProperty("jira.apiToken");
-        String personalAccessToken = ConfigManager.getProperty("jira.personalAccessToken");
-        String authHeader;
-
-        // Create a basic authentication header
-        if (!apiToken.isEmpty() & personalAccessToken.isEmpty()) {
-            authHeader = "Basic " + java.util.Base64.getEncoder().encodeToString((username + ":" + apiToken).getBytes());
-        } else {
-            authHeader = "Bearer " + personalAccessToken;
-        }
-
-        // Build the HTTP request to fetch user accountId
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(jiraUrl + "/rest/api/2/user/search?query=" + username))
-                .header("Authorization", authHeader)
-                .header("Content-Type", "application/json")
-                .GET()
-                .build();
-
-        // Send the HTTP request
-        HttpClient client = HttpClient.newHttpClient();
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        HttpResponse<String> response = JiraHttpClient.sendGetRequest("/rest/api/2/user/search?query=" + username);
 
         // Check the response status
         if (response.statusCode() == 200) {
