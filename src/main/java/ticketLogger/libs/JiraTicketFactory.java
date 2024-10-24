@@ -1,5 +1,7 @@
 package ticketLogger.libs;
 
+import com.google.gson.JsonParser;
+
 import java.net.http.HttpResponse;
 import java.util.Arrays;
 import java.util.Map;
@@ -44,6 +46,10 @@ public class JiraTicketFactory {
                 ticket.setCustomField(entry.getKey(), entry.getValue());
             }
         }
+        //Assigned the ticket to the reporter
+        String reporterUsername = ConfigManager.getProperty("jira.username");
+        String reporterAccountId = getAccountId(reporterUsername);
+        ticket.setCustomField("assignee", Map.of("id", reporterAccountId));
 
         return ticket;
     }
@@ -54,7 +60,7 @@ public class JiraTicketFactory {
         // Check the response status
         if (response.statusCode() == 200) {
             // Parse the response to get the field type
-            com.google.gson.JsonArray fields = new com.google.gson.JsonParser().parse(response.body()).getAsJsonArray();
+            com.google.gson.JsonArray fields = JsonParser.parseString(response.body()).getAsJsonArray();
             for (com.google.gson.JsonElement field : fields) {
                 com.google.gson.JsonObject fieldObject = field.getAsJsonObject();
                 if (fieldObject.get("key").getAsString().equals(fieldName)) {
@@ -74,7 +80,7 @@ public class JiraTicketFactory {
         // Check the response status
         if (response.statusCode() == 200) {
             // Parse the response to get the accountId
-            com.google.gson.JsonArray users = new com.google.gson.JsonParser().parse(response.body()).getAsJsonArray();
+            com.google.gson.JsonArray users = JsonParser.parseString(response.body()).getAsJsonArray();
             if (!users.isEmpty()) {
                 return users.get(0).getAsJsonObject().get("accountId").getAsString();
             } else {
