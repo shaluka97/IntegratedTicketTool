@@ -34,4 +34,9 @@ public class JiraTicket {
         fields.putAll(customFields);  // Add custom fields dynamically
         return fields;
     }
+
+    public JiraTicket createSubTask(String summary) {
+        return new JiraTicket(this.projectKey, "Sub-task", summary, "", this.priority);
+    }
+
 }

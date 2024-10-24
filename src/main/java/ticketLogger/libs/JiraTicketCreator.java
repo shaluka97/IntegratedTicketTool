@@ -25,4 +25,12 @@ public class JiraTicketCreator {
         com.google.gson.JsonObject jsonObject = new com.google.gson.JsonParser().parse(responseBody).getAsJsonObject();
         return jsonObject.get("key").getAsString();
     }
+    public static void createJiraSubTask(Map<String, Object> issueDetails, String parentTicketId) throws Exception {
+        issueDetails.put("parent", Map.of("key", parentTicketId));
+        String jsonBody = new com.google.gson.Gson().toJson(Map.of("fields", issueDetails));
+        HttpResponse<String> response = JiraHttpClient.sendPostRequest("/rest/api/2/issue", jsonBody);
+        if (response.statusCode() != 201) {
+            throw new Exception("Failed to create sub-task. Response code: " + response.statusCode() + ", Body: " + response.body());
+        }
+    }
 }
