@@ -6,7 +6,6 @@ import ticketLogger.libs.JiraTicketCreator;
 import ticketLogger.libs.JiraTicketFactory;
 
 import java.util.Map;
-import java.util.Optional;
 
 public class TicketLoggerMain {
 
@@ -21,7 +20,7 @@ public class TicketLoggerMain {
             System.out.println("Ticket created successfully: \u001B[31m" + ticketId + "\u001B[0m");
 
             // Extract the assignee from the main ticket
-            Optional<Map<String, String>> assignee = Optional.ofNullable((Map<String, String>) ticket.toJsonMap().get("assignee"));
+            Map<String, String> assignee = (Map<String, String>) ticket.toJsonMap().get("assignee");
 
             // Create sub-tasks if the main task is of type "Task" and sub-tasks are mentioned in the config
             if ("Task".equalsIgnoreCase(taskType)) {
@@ -30,7 +29,7 @@ public class TicketLoggerMain {
                     String[] subTaskNames = subTaskNamesProperty.split(",");
                     for (String subTaskName : subTaskNames) {
                         JiraTicket subTask = ticket.createSubTask(subTaskName.trim());
-                        if (assignee.isPresent()) {
+                        if (assignee!=null) {
                             subTask.setCustomField("assignee", assignee);
                         }
                         JiraTicketCreator.createJiraSubTask(subTask.toJsonMap(), ticketId);

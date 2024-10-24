@@ -49,7 +49,7 @@ public class JiraTicketFactory {
         //Assigned the ticket to the reporter
         String reporterUsername = ConfigManager.getProperty("jira.username");
         String reporterAccountId = getAccountId(reporterUsername);
-        ticket.setCustomField("assignee", Map.of("id", reporterAccountId));
+        ticket.setCustomField("assignee", Map.of("name", reporterAccountId));
 
         return ticket;
     }
@@ -63,7 +63,7 @@ public class JiraTicketFactory {
             com.google.gson.JsonArray fields = JsonParser.parseString(response.body()).getAsJsonArray();
             for (com.google.gson.JsonElement field : fields) {
                 com.google.gson.JsonObject fieldObject = field.getAsJsonObject();
-                if (fieldObject.get("key").getAsString().equals(fieldName)) {
+                if (fieldObject.get("id").getAsString().equals(fieldName)) {
                     return fieldObject.get("schema").getAsJsonObject().get("type").getAsString();
                 }
             }
@@ -75,14 +75,14 @@ public class JiraTicketFactory {
     }
 
     private static String getAccountId(String username) throws Exception {
-        HttpResponse<String> response = JiraHttpClient.sendGetRequest("/rest/api/2/user/search?query=" + username);
+        HttpResponse<String> response = JiraHttpClient.sendGetRequest("/rest/api/2/user/search?username=" + username);
 
         // Check the response status
         if (response.statusCode() == 200) {
             // Parse the response to get the accountId
             com.google.gson.JsonArray users = JsonParser.parseString(response.body()).getAsJsonArray();
             if (!users.isEmpty()) {
-                return users.get(0).getAsJsonObject().get("accountId").getAsString();
+                return users.get(0).getAsJsonObject().get("name").getAsString();
             } else {
                 throw new Exception("No user found with username: " + username);
             }
